@@ -70,26 +70,53 @@ app.get('/users/:userId', function (req, res) {
 
 app.put('/users/:userId', jsonParser, function (req, res) {
 
-    console.log(req.body);
     User.findOneAndUpdate({
-        id: req.params.userId
-    }, function (err, user){}
+            _id: req.params.userId
+        }, {username: req.body.username, _id: req.params.userId}, {upsert: true}, function (err, user) {
+
+            if (req.body.username === "" || !req.body.username)// check to see username is string
+            {
+                return res.status(422).json({
+                    message: 'Missing field: username'
+                });
+            }
+            else if (typeof req.body.username !== "string") {
+                return res.status(422).json({
+                    message: 'Incorrect field type: username'
+                });
+            }
+            else {
+                if (err) {
+                    return res.sendStatus(500);
+                }
+
+                return res.status(200).json({});
+
+            }
+        }
     );
+});
 
+app.delete('/users/:userId', jsonParser, function (req, res) {
 
-//var user = new User({
-//    username: req.body.username,
-//    _id: req.params.userId
-//});
+    User.findOneAndRemove({
+            _id: req.params.userId
+        }, function (err, user) {
 
+            if (!user)
+            {
+                return res.status(404).json({message: 'User not found'});
+            }
+            else {
+                if (err) {
+                    return res.sendStatus(500);
+                }
 
-//user.save(function (err, user) {
-//    if (err) {
-//        return res.sendStatus(500);
-//    }
-//
-//    return res.status(200).location('/users/' + user._id).json({});
-//});
+                return res.status(200).json({});
+
+            }
+        }
+    );
 });
 
 
