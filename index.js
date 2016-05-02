@@ -9,59 +9,93 @@ var app = express();
 var jsonParser = bodyParser.json();
 
 // Add your API endpoints here
-app.get('/users', function(req, res) {
-    User.find({}, function(err, users) {
+app.get('/users', function (req, res) {
+    User.find({}, function (err, users) {
         if (err) {
             return res.sendStatus(500);
         }
 
-        return res.json(users);
+        return res.status(200).json(users);
     });
 });
 
-app.post('/users', jsonParser, function(req, res) {
+app.post('/users', jsonParser, function (req, res) {
     var user = new User({
         username: req.body.username
     });
-if (req.body.username === "" || !req.body.username )// check to see username is string
-{
-    return res.status(422).json({
-        message: 'Missing field: username'
-    });
-}
-else if (typeof req.body.username !== "string") {
-    return res.status(422).json({
-        message: 'Incorrect field type: username'
-    });
-}
+    if (req.body.username === "" || !req.body.username)// check to see username is string
+    {
+        return res.status(422).json({
+            message: 'Missing field: username'
+        });
+    }
+    else if (typeof req.body.username !== "string") {
+        return res.status(422).json({
+            message: 'Incorrect field type: username'
+        });
+    }
     else {
-        user.save(function(err, user) {
-        if (err) {
-            return res.sendStatus(500);
-        }
+        user.save(function (err, user) {
+            if (err) {
+                return res.sendStatus(500);
+            }
 
-        return res.status(201).location('/users/' + user._id).json({});
-    });
+            return res.status(201).location('/users/' + user._id).json({});
+        });
     }
 });
 
 
-app.get('/users/:userId', function(req, res) {
+app.get('/users/:userId', function (req, res) {
     User.findOne({
         _id: req.params.userId
-    }, function(err, user) {
-        if (err) {
-            
-            return res.sendStatus(404);
+    }, function (err, user) {
+
+        if (!user) {
+            return res.status(404).json({message: 'User not found'});
         }
 
-        return res.json(user);
+        else {
+
+            if (err) {
+
+                return res.sendStatus(500);
+            }
+
+            return res.json(user);
+        }
+
     });
 });
 
+app.put('/users/:userId', jsonParser, function (req, res) {
+
+    console.log(req.body);
+    User.findOneAndUpdate({
+        id: req.params.userId
+    }, function (err, user){}
+    );
+
+
+//var user = new User({
+//    username: req.body.username,
+//    _id: req.params.userId
+//});
+
+
+//user.save(function (err, user) {
+//    if (err) {
+//        return res.sendStatus(500);
+//    }
+//
+//    return res.status(200).location('/users/' + user._id).json({});
+//});
+});
+
+
 var databaseUri = global.databaseUri || 'mongodb://localhost/sup';
-mongoose.connect(databaseUri).then(function() {
-    app.listen(8080, function() {
+mongoose.connect(databaseUri).then(function () {
+    app.listen(8080, function () {
         console.log('Listening on localhost:8080');
     });
 });
