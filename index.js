@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var Message = require('./models/message');
 
 var User = require('./models/user');
 
@@ -118,12 +119,22 @@ app.delete('/users/:userId', jsonParser, function (req, res) {
         }
     );
 });
+app.get('/message', function (req, res) {
+    message.find({}, function (err, messages) {
+        if (err) {
+            return res.sendStatus(500);
+        }
 
+        return res.status(200).json(messages);
+    });
+});
 
 var databaseUri = global.databaseUri || 'mongodb://localhost/sup';
 mongoose.connect(databaseUri).then(function () {
     app.listen(8080, function () {
         console.log('Listening on localhost:8080');
+
+
     });
 });
 
