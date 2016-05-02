@@ -23,14 +23,26 @@ app.post('/users', jsonParser, function(req, res) {
     var user = new User({
         username: req.body.username
     });
-
-    user.save(function(err, user) {
+if (req.body.username === "" || !req.body.username )// check to see username is string
+{
+    return res.status(422).json({
+        message: 'Missing field: username'
+    });
+}
+else if (typeof req.body.username !== "string") {
+    return res.status(422).json({
+        message: 'Incorrect field type: username'
+    });
+}
+    else {
+        user.save(function(err, user) {
         if (err) {
             return res.sendStatus(500);
         }
 
         return res.status(201).location('/users/' + user._id).json({});
     });
+    }
 });
 
 
@@ -39,7 +51,8 @@ app.get('/users/:userId', function(req, res) {
         _id: req.params.userId
     }, function(err, user) {
         if (err) {
-            return res.sendStatus(500);
+            
+            return res.sendStatus(404);
         }
 
         return res.json(user);
@@ -54,4 +67,3 @@ mongoose.connect(databaseUri).then(function() {
 });
 
 module.exports = app;
-
