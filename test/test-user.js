@@ -331,12 +331,12 @@ describe('User endpoints', function() {
                     })
                     .catch(function(err) {
                         var res = err.response;
-                        res.should.have.status(404);
-                        res.type.should.equal('application/json');
-                        res.charset.should.equal('utf-8');
+                        res.should.have.status(401);
+                        // console.log(res);
+                        res.type.should.equal("");
+                        // res.charset.should.equal('utf-8');
+                        // charset not needed because it not included in the doc array.
                         res.body.should.be.an('object');
-                        res.body.should.have.property('message');
-                        res.body.message.should.equal('User not found');
                     });
             });
             it('should delete a user', function() {
@@ -359,9 +359,6 @@ describe('User endpoints', function() {
 
                     }.bind(this))
                     .then(function(res) {
-                        console.log(req.user);
-                        // how to test an authenticated user?????????????
-
                         res.should.have.status(200);
                         res.type.should.equal('application/json');
                         res.charset.should.equal('utf-8');
