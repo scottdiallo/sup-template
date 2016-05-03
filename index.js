@@ -47,6 +47,8 @@ passport.use(strategy);
 app.use(passport.initialize());
 
 var jsonParser = bodyParser.json();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true}));
 
 app.get('/users', function(req, res) {
     User.find({}).then(function(users) {
@@ -54,7 +56,7 @@ app.get('/users', function(req, res) {
     });
 });
 
-app.post('/users', jsonParser, function(req, res) {
+app.post('/users', function(req, res) {
     if (!req.body) {
         return res.status(400).json({
             message: "No request body"
@@ -63,6 +65,7 @@ app.post('/users', jsonParser, function(req, res) {
 
     if (!('username' in req.body)) {
         return res.status(422).json({
+            //console.log(req.body.username);
             message: 'Missing field: username'
         });
     }
@@ -116,9 +119,10 @@ app.post('/users', jsonParser, function(req, res) {
                 password: hash
 
             });
-
+            console.log("First log", user);
             user.save().then(function(user) {
-                res.location('/users/' + user._id).status(201).json({});
+                console.log("Second Log", user);
+                res.location('/users/' + user._id).status(201).json(user);
             }).catch(function(err) {
                 res.status(500).send({
                     message: 'Internal server error'
