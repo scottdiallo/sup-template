@@ -146,7 +146,9 @@ describe('User endpoints', function() {
             it('should 404 on non-existent users', function() {
                 var spy = chai.spy();
                 return chai.request(app)
-                    .get(this.pattern.stringify({userId: '000000000000000000000000'}))
+                    .get(this.pattern.stringify({
+                        userId: '000000000000000000000000'
+                    }))
                     .then(spy)
                     .then(function() {
                         spy.should.not.have.been.called();
@@ -324,7 +326,9 @@ describe('User endpoints', function() {
             it('should 404 on non-existent users', function() {
                 var spy = chai.spy();
                 return chai.request(app)
-                    .delete(this.pattern.stringify({userId: '000000000000000000000000'}))
+                    .delete(this.pattern.stringify({
+                        userId: '000000000000000000000000'
+                    }))
                     .then(spy)
                     .then(function() {
                         spy.should.not.have.been.called();

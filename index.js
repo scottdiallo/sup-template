@@ -10,6 +10,39 @@ var Message = require('./models/message');
 var app = express();
 
 var passport = require('passport');
+var BasicStrategy = require('passport-http').BasicStrategy;
+
+var strategy = new BasicStrategy(function(username, password, callback) {
+    User.findOne({
+        username: username
+    }, function(err, user) {
+        if (err) {
+            callback(err);
+            return;
+        }
+
+        if (!user) {
+            return callback(null, false, {
+                message: 'Incorrect username.'
+            });
+        }
+
+        user.validatePassword(password, function(err, isValid) {
+            if (err) {
+                return callback(err);
+            }
+
+            if (!isValid) {
+                return callback(null, false, {
+                    message: 'Incorrect password.'
+                });
+            }
+            return callback(null, user);
+        });
+    });
+});
+
+passport.use(strategy);
 
 app.use(passport.initialize());
 
@@ -64,35 +97,35 @@ app.post('/users', jsonParser, function(req, res) {
         });
     }
 
-    bcrypt.genSalt(10, function (err, salt) {
-      if (err) {
-        return res.status(500).json({
-          message: 'Internal server error'
-        });
-      }
-
-      bcrypt.hash(password, salt, function(err, hash) {
+    bcrypt.genSalt(10, function(err, salt) {
         if (err) {
-          return res.status(500).json({
-            message: 'Internal server error'
-          });
-        }
-
-        var user = new User({
-            username: username,
-            password: hash
-
-        });
-
-        user.save().then(function(user) {
-            res.location('/users/' + user._id).status(201).json({});
-        }).catch(function(err) {
-            res.status(500).send({
+            return res.status(500).json({
                 message: 'Internal server error'
             });
+        }
+
+        bcrypt.hash(password, salt, function(err, hash) {
+            if (err) {
+                return res.status(500).json({
+                    message: 'Internal server error'
+                });
+            }
+
+            var user = new User({
+                username: username,
+                password: hash
+
+            });
+
+            user.save().then(function(user) {
+                res.location('/users/' + user._id).status(201).json({});
+            }).catch(function(err) {
+                res.status(500).send({
+                    message: 'Internal server error'
+                });
+            });
         });
-      })
-    })
+    });
 });
 
 app.get('/users/:userId', function(req, res) {
@@ -244,14 +277,12 @@ app.post('/messages', jsonParser, function(req, res) {
             res.status(422).json({
                 message: 'Incorrect field value: from'
             });
-        }
-        else if (!results[1]) {
+        } else if (!results[1]) {
             res.status(422).json({
                 message: 'Incorrect field value: to'
             });
-        }
-        else {
-            return message.save()
+        } else {
+            return message.save();
         }
     }).then(function(user) {
         res.location('/messages/' + message._id).status(201).json({});
@@ -264,24 +295,35 @@ app.post('/messages', jsonParser, function(req, res) {
 
 app.get('/messages/:messageId', function(req, res) {
     Message.findOne({
-        _id: req.params.messageId
-    })
-    .populate('from')
-    .populate('to')
-    .then(function(message) {
-        if (!message) {
-            res.status(404).json({
-                message: 'Message not found'
+            _id: req.params.messageId
+        })
+        .populate('from')
+        .populate('to')
+        .then(function(message) {
+            if (!message) {
+                res.status(404).json({
+                    message: 'Message not found'
+                });
+                return;
+            }
+            res.json(message);
+        }).catch(function(err) {
+            res.status(500).send({
+                message: 'Internal server error'
             });
-            return;
-        }
-        res.json(message);
-    }).catch(function(err) {
-        res.status(500).send({
-            message: 'Internal server error'
         });
+});
+
+app.use(passport.initialize());
+
+app.get('/hidden', passport.authenticate('basic', {
+    session: false
+}), function(req, res) {
+    res.json({
+        message: 'Luke...I am your father'
     });
 });
+
 
 var databaseUri = global.databaseUri || 'mongodb://localhost/sup';
 mongoose.connect(databaseUri).then(function() {
