@@ -36,7 +36,8 @@ describe('User endpoints', function() {
 
             it('should return a list of users', function() {
                 var user = {
-                    username: 'joe'
+                    username: 'joe',
+                    password: 'string'
                 };
                 return chai.request(app)
                     .post(this.pattern.stringify())
@@ -64,7 +65,8 @@ describe('User endpoints', function() {
         describe('POST', function() {
             it('should allow adding a user', function() {
                 var user = {
-                    username: 'joe'
+                    username: 'joe',
+                    password: 'string'
                 };
                 return chai.request(app)
                     .post(this.pattern.stringify())
@@ -161,7 +163,8 @@ describe('User endpoints', function() {
 
             it('should return a single user', function() {
                 var user = {
-                    username: 'joe'
+                    username: 'joe',
+                    password: 'string'
                 };
                 var params;
                 return chai.request(app)
@@ -192,10 +195,12 @@ describe('User endpoints', function() {
         describe('PUT', function() {
             it('should allow editing a user', function() {
                 var oldUser = {
-                    username: 'joe'
+                    username: 'joe',
+                    password: 'string'
                 };
                 var newUser = {
-                    username: 'joe2'
+                    username: 'joe2',
+                    password: 'string'
                 };
                 var params;
                 return chai.request(app)
@@ -234,7 +239,8 @@ describe('User endpoints', function() {
             it('should create a user if they don\'t exist', function() {
                 var user = {
                     _id: '000000000000000000000000',
-                    username: 'joe'
+                    username: 'joe',
+                    password: 'string'
                 };
                 return chai.request(app)
                     .put(this.pattern.stringify({
@@ -335,7 +341,8 @@ describe('User endpoints', function() {
             });
             it('should delete a user', function() {
                 var user = {
-                    username: 'joe'
+                    username: 'joe',
+                    password: 'string'
                 };
                 var params;
                 return chai.request(app)

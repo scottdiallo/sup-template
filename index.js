@@ -4,13 +4,47 @@ var mongoose = require('mongoose');
 var Message = require('./models/message');
 var bcrypt = require('bcrypt');
 var User = require('./models/user');
-
+var passport = require('passport');
+var BasicStrategy = require('passport-http').BasicStrategy;
 var app = express();
-
 var jsonParser = bodyParser.json();
+app.use(passport.initialize());
+
+var strategy = new BasicStrategy(function(username, password, callback) {
+    User.findOne({ // check user in db to see if it exist
+        username: username
+    }, function(err, user){
+        if(err){
+            callback(err);
+            return;
+        }
+        if(!user){ // if user do not exist then return is called
+            return callback(null, false,{
+                message: 'Incorrect username'
+            });
+        }
+        user.validatePassword(password, function(err, isValid){
+            if (err) {
+                callback(err);
+            }
+            if (!isValid) {
+                return callback(null, false, {
+                    message: 'Incorrect password'
+                });
+            }
+            return callback(null, user);
+        });
+
+    });
+});
+passport.use(strategy); //telling passport to use strategy 12-38
 
 // Add your API endpoints here
-app.get('/users', function(req, res) {
+app.get('/users',
+passport.authenticate('basic', {
+    session: false
+}),
+function(req, res) {
     User.find({}).then(function(users) {
         res.json(users);
     });
@@ -34,6 +68,7 @@ app.post('/users', jsonParser, function(req, res) {
             message: 'Incorrect field type: username'
         });
     }
+    var password = req.body.password;
 bcrypt.genSalt(12, function(err, salt){ // salt the password
     if (err){
         return res.status(500).json({
@@ -56,7 +91,7 @@ bcrypt.genSalt(12, function(err, salt){ // salt the password
                     message: "Internal server error"
                 });
             }
-            return res.status(201).json({});
+            return res.location('/users/' + user._id).status(201).json({});
         });
     });
 });
@@ -128,7 +163,11 @@ app.put('/users/:userId', jsonParser, function(req, res) {
     });
 });
 
-app.delete('/users/:userId', function(req, res) {
+app.delete('/users/:userId',
+passport.authenticate('basic', { // authenticating delete
+    session: false
+}),
+function(req, res) {
     User.findOneAndRemove({
         _id: req.params.userId
     }).then(function(user) {
