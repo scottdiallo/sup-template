@@ -2,7 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var Message = require('./models/message');
-
+var bcrypt = require('bcrypt');
 var User = require('./models/user');
 
 var app = express();
@@ -34,19 +34,44 @@ app.post('/users', jsonParser, function(req, res) {
             message: 'Incorrect field type: username'
         });
     }
-
-    var user = new User({
-        username: req.body.username
-    });
-
-    user.save().then(function(user) {
-        res.location('/users/' + user._id).status(201).json({});
-    }).catch(function(err) {
-        console.log(err);
-        res.status(500).send({
-            message: 'Internal server error'
+bcrypt.genSalt(12, function(err, salt){ // salt the password
+    if (err){
+        return res.status(500).json({
+            message:"Internal server error"
+        });
+    }
+    bcrypt.hash(password, salt,function(err, hash){ //hash password
+        if (err) {
+            return res.status(500).json({
+                message: "Internal server error"
+            });
+        }
+        var user = new User({ // user created
+            username: req.body.username,
+            password: hash // equal hash because passcode is hash now
+        });
+        user.save(function(err){// saving user in database
+            if(err) {
+                return res.status(500).json({
+                    message: "Internal server error"
+                });
+            }
+            return res.status(201).json({});
         });
     });
+});
+    // var user = new User({
+    //     username: req.body.username
+    // });
+    //
+    // user.save().then(function(user) {
+    //     res.location('/users/' + user._id).status(201).json({});
+    // }).catch(function(err) {
+    //     console.log(err);
+    //     res.status(500).send({
+    //         message: 'Internal server error'
+    //     });
+    // });
 });
 
 app.get('/users/:userId', function(req, res) {
