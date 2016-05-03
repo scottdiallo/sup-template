@@ -12,8 +12,6 @@ var UserSchema = new mongoose.Schema({
     }
 });
 
-var User = mongoose.model('User', UserSchema);
-// validating a password
 UserSchema.methods.validatePassword = function(password, callback){
         bcrypt.compare(password, this.password, function(err, isValid){ // comparing the input password with current password in database
             if(err){
@@ -23,5 +21,8 @@ UserSchema.methods.validatePassword = function(password, callback){
             callback(null, isValid);
         });
 };
+var User = mongoose.model('User', UserSchema);
+// validating a password
+
 
 module.exports = User;

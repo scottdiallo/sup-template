@@ -320,7 +320,7 @@ describe('User endpoints', function() {
             });
         });
 
-        describe('DELETE', function() {
+        describe.only('DELETE', function() {
             it('should 404 on non-existent users', function() {
                 var spy = chai.spy();
                 return chai.request(app)
@@ -353,9 +353,15 @@ describe('User endpoints', function() {
                         return chai.request(app)
                             .delete(this.pattern.stringify({
                                 userId: params.userId
-                            }));
+                            }))
+                            .auth('joe', 'string');
+
+
                     }.bind(this))
                     .then(function(res) {
+                        console.log(req.user);
+                        // how to test an authenticated user?????????????
+
                         res.should.have.status(200);
                         res.type.should.equal('application/json');
                         res.charset.should.equal('utf-8');
