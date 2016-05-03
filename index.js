@@ -2,10 +2,16 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
+var bcrypt = require('bcrypt');
+
 var User = require('./models/user');
 var Message = require('./models/message');
 
 var app = express();
+
+var passport = require('passport');
+
+app.use(passport.initialize());
 
 var jsonParser = bodyParser.json();
 
@@ -28,23 +34,65 @@ app.post('/users', jsonParser, function(req, res) {
         });
     }
 
-    if (typeof req.body.username !== 'string') {
+    var username = req.body.username;
+
+    if (typeof username !== 'string') {
         return res.status(422).json({
             message: 'Incorrect field type: username'
         });
     }
 
-    var user = new User({
-        username: req.body.username
-    });
-
-    user.save().then(function(user) {
-        res.location('/users/' + user._id).status(201).json({});
-    }).catch(function(err) {
-        res.status(500).send({
-            message: 'Internal server error'
+    if (!('password' in req.body)) {
+        return res.status(422).json({
+            message: 'Missing field: password'
         });
-    });
+    }
+
+    var password = req.body.password;
+
+    if (typeof password !== 'string') {
+        return res.status(422).json({
+            message: 'Incorrect field type: password'
+        });
+    }
+
+    password = password.trim();
+
+    if (password === '') {
+        return res.status(422).json({
+            message: 'Incorrect field length: password'
+        });
+    }
+
+    bcrypt.genSalt(10, function (err, salt) {
+      if (err) {
+        return res.status(500).json({
+          message: 'Internal server error'
+        });
+      }
+
+      bcrypt.hash(password, salt, function(err, hash) {
+        if (err) {
+          return res.status(500).json({
+            message: 'Internal server error'
+          });
+        }
+
+        var user = new User({
+            username: username,
+            password: hash
+
+        });
+
+        user.save().then(function(user) {
+            res.location('/users/' + user._id).status(201).json({});
+        }).catch(function(err) {
+            res.status(500).send({
+                message: 'Internal server error'
+            });
+        });
+      })
+    })
 });
 
 app.get('/users/:userId', function(req, res) {
@@ -243,4 +291,3 @@ mongoose.connect(databaseUri).then(function() {
 });
 
 module.exports = app;
-

@@ -37,7 +37,8 @@ describe('User endpoints', function() {
 
             it('should return a list of users', function() {
                 var user = {
-                    username: 'joe'
+                    username: 'joe',
+                    password: 'why1234'
                 };
                 return chai.request(app)
                     .post(this.pattern.stringify())
@@ -65,7 +66,8 @@ describe('User endpoints', function() {
         describe('POST', function() {
             it('should allow adding a user', function() {
                 var user = {
-                    username: 'joe'
+                    username: 'joe',
+                    password: 'why123'
                 };
                 return chai.request(app)
                     .post(this.pattern.stringify())
@@ -162,7 +164,8 @@ describe('User endpoints', function() {
 
             it('should return a single user', function() {
                 var user = {
-                    username: 'joe'
+                    username: 'joe',
+                    password: 'whhhhhyyyy'
                 };
                 var params;
                 return chai.request(app)
@@ -193,10 +196,12 @@ describe('User endpoints', function() {
         describe('PUT', function() {
             it('should allow editing a user', function() {
                 var oldUser = {
-                    username: 'joe'
+                    username: 'joe',
+                    password: 'whyyyyy'
                 };
                 var newUser = {
-                    username: 'joe2'
+                    username: 'joe2',
+                    password: 'whyyyyy'
                 };
                 var params;
                 return chai.request(app)
@@ -336,7 +341,8 @@ describe('User endpoints', function() {
             });
             it('should delete a user', function() {
                 var user = {
-                    username: 'joe'
+                    username: 'joe',
+                    password: 'overit321'
                 };
                 var params;
                 return chai.request(app)
