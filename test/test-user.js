@@ -22,18 +22,6 @@ describe('User endpoints', function() {
         });
 
         describe('GET', function() {
-        //     it('should return an empty list of users initially', function() {
-        //         return chai.request(app)
-        //             .get(this.pattern.stringify())
-        //             .then(function(res) {
-        //                 res.should.have.status(200);
-        //                 res.type.should.equal('application/json');
-        //                 res.charset.should.equal('utf-8');
-        //                 res.body.should.be.an('array');
-        //                 res.body.length.should.equal(0);
-        //             });
-        //     });
-
             it('should return a list of users', function() {
                 var user = {
                     username: 'joe',
@@ -300,17 +288,27 @@ describe('User endpoints', function() {
             //         });
             // });
             it('should reject non-string usernames', function() {
-                var user = {
-                    _id: '000000000000000000000000',
-                    username: 42
+                var oldUser = {
+                    username: 'Scott',
+                    password: 'loves simon'
+                }
+                var newUser = {
+                    username: 42,
+                    password: 'loves simon'
                 };
                 var spy = chai.spy();
                 return chai.request(app)
-                    .put(this.pattern.stringify({
-                        userId: user._id
-                    }))
-                    .auth(42)
-                    .send(user)
+                    .post('/users')
+                    .send(oldUser)
+                    .then(function(res) {
+                        params = this.pattern.match(res.headers.location);
+                        return chai.request(app)
+                            .put(this.pattern.stringify({
+                                userId: params.userId
+                            }))
+                            .auth('Scott', 'loves simon')
+                            .send(newUser);
+                    }.bind(this))
                     .then(spy)
                     .then(function() {
                         spy.should.not.have.been.called();
