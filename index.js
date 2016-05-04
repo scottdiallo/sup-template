@@ -128,7 +128,10 @@ app.get('/users/:userId', function(req, res) {
     });
 });
 
-app.put('/users/:userId', jsonParser, function(req, res) {
+app.put('/users/:userId', jsonParser,passport.authenticate('basic', {
+    session: false
+}), function(req, res) {
+
     if (!req.body) {
         return res.status(400).json({
             message: "No request body"
