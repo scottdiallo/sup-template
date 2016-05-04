@@ -5,6 +5,7 @@ var chaiHttp = require('chai-http');
 var spies = require('chai-spies');
 var mongoose = require('mongoose');
 var UrlPattern = require('url-pattern');
+// console.log(UrlPattern);
 var app = require('../index');
 
 var should = chai.should();
@@ -13,43 +14,48 @@ chai.use(chaiHttp);
 chai.use(spies);
 
 describe('Message endpoints', function() {
-    beforeEach(function() {
+    beforeEach('Create Users', function() {
+        // console.log('IN Create User!');
         mongoose.connection.db.dropDatabase();
         this.alice = {
             username: 'alice',
-            _id: 'AAAAAAAAAAAAAAAAAAAAAAAA'
+            password: 'alice'
+            // _id: 'AAAAAAAAAAAAAAAAAAAAAAAA'
         };
 
         this.bob = {
             username: 'bob',
-            _id: 'BBBBBBBBBBBBBBBBBBBBBBBB'
+            password: 'bob'
+            // _id: 'BBBBBBBBBBBBBBBBBBBBBBBB'
         };
 
         this.chuck = {
             username: 'chuck',
-            _id: 'CCCCCCCCCCCCCCCCCCCCCCCC'
+            password: 'chuck'
+            // _id: 'CCCCCCCCCCCCCCCCCCCCCCCC'
         };
 
         // Create users
         var promiseA = chai.request(app)
-                .put('/users/' + this.alice._id)
+                .post('/users')
                 .send(this.alice);
         var promiseB = chai.request(app)
-                .put('/users/' + this.bob._id)
+                .post('/users')
                 .send(this.bob);
         var promiseC = chai.request(app)
-                .put('/users/' + this.chuck._id)
+                .post('/users')
                 .send(this.chuck);
         return Promise.all([promiseA, promiseB, promiseC]);
     });
 
     describe('/messages', function() {
-        beforeEach(function() {
+        beforeEach('Get Pattern', function() {
             this.pattern = new UrlPattern('/messages');
         });
 
         describe('GET', function() {
             it('should return an empty list of messages initially', function() {
+                // console.log("HELLOOOOOO ", this.pattern);
                 return chai.request(app)
                     .get(this.pattern.stringify())
                     .then(function(res) {

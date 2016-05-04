@@ -19,10 +19,12 @@ describe('User endpoints', function() {
     describe('/users', function() {
         beforeEach(function() {
             this.pattern = new UrlPattern('/users');
+            // console.log("In users ", this.pattern);
         });
 
         describe('GET', function() {
             it('should return a list of users', function() {
+              // console.log("In users ", this.pattern);
                 var user = {
                     username: 'joe',
                     password: 'string'
