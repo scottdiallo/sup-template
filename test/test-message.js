@@ -19,20 +19,20 @@ describe('Message endpoints', function() {
         mongoose.connection.db.dropDatabase();
         this.alice = {
             username: 'alice',
-            password: 'alice'
-            // _id: 'AAAAAAAAAAAAAAAAAAAAAAAA'
+            password: 'alice',
+            _id: 'AAAAAAAAAAAAAAAAAAAAAAAA'
         };
 
         this.bob = {
             username: 'bob',
-            password: 'bob'
-            // _id: 'BBBBBBBBBBBBBBBBBBBBBBBB'
+            password: 'bob',
+            _id: 'BBBBBBBBBBBBBBBBBBBBBBBB'
         };
 
         this.chuck = {
             username: 'chuck',
-            password: 'chuck'
-            // _id: 'CCCCCCCCCCCCCCCCCCCCCCCC'
+            password: 'chuck',
+            _id: 'CCCCCCCCCCCCCCCCCCCCCCCC'
         };
 
         // Create users
@@ -55,7 +55,6 @@ describe('Message endpoints', function() {
 
         describe('GET', function() {
             it('should return an empty list of messages initially', function() {
-                // console.log("HELLOOOOOO ", this.pattern);
                 return chai.request(app)
                     .get(this.pattern.stringify())
                     .then(function(res) {
@@ -366,7 +365,7 @@ describe('Message endpoints', function() {
                     .then(function(res) {
                         res.should.have.status(201);
                         res.type.should.equal('application/json');
-                        res.charset.should.equal('utf-8');
+                        // res.charset.should.equal('utf-8');
                         res.should.have.header('location');
                         res.body.should.be.an('object');
                         res.body.should.be.empty;
