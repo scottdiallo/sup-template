@@ -50,19 +50,7 @@ var jsonParser = bodyParser.json();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
 
-app.use(passport.initialize());
-
-app.get('/hidden', passport.authenticate('basic', {
-    session: false
-}), function(req, res) {
-    res.json({
-        message: 'Luke...I am your father'
-    });
-});
-
-app.get('/users', passport.authenticate('basic', {
-    session: false
-}), function(req, res) {
+app.get('/users', function(req, res) {
     User.find({}).then(function(users) {
         res.json(users);
     });
@@ -112,7 +100,7 @@ app.post('/users', function(req, res) {
         });
     }
 
-    bcrypt.genSalt(10, function(err, salt) {
+    bcrypt.genSalt(50, function(err, salt) {
         if (err) {
             return res.status(500).json({
                 message: 'Internal server error'
@@ -131,9 +119,9 @@ app.post('/users', function(req, res) {
                 password: hash
 
             });
-            // console.log("First log", user);
+            console.log("First log", user);
             user.save().then(function(user) {
-                // console.log("Second Log", user);
+                console.log("Second Log", user);
                 res.location('/users/' + user._id).status(201).json(user);
             }).catch(function(err) {
                 res.status(500).send({
@@ -144,9 +132,7 @@ app.post('/users', function(req, res) {
     });
 });
 
-app.get('/users/:userId', passport.authenticate('basic', {
-    session: false
-}), function(req, res) {
+app.get('/users/:userId', function(req, res) {
     User.findOne({
         _id: req.params.userId
     }).then(function(user) {
@@ -199,9 +185,7 @@ app.put('/users/:userId', jsonParser, function(req, res) {
     });
 });
 
-app.delete('/users/:userId', passport.authenticate('basic', {
-    session: false
-}), function(req, res) {
+app.delete('/users/:userId', function(req, res) {
     User.findOneAndRemove({
         _id: req.params.userId
     }).then(function(user) {
@@ -220,9 +204,7 @@ app.delete('/users/:userId', passport.authenticate('basic', {
 
 });
 
-app.get('/messages', passport.authenticate('basic', {
-    session: false
-}), function(req, res) {
+app.get('/messages', function(req, res) {
     var filter = {};
     if ('to' in req.query) {
         filter.to = req.query.to;
@@ -315,9 +297,7 @@ app.post('/messages', jsonParser, function(req, res) {
     });
 });
 
-app.get('/messages/:messageId', passport.authenticate('basic', {
-    session: false
-}), function(req, res) {
+app.get('/messages/:messageId', function(req, res) {
     Message.findOne({
             _id: req.params.messageId
         })
@@ -337,6 +317,17 @@ app.get('/messages/:messageId', passport.authenticate('basic', {
             });
         });
 });
+
+app.use(passport.initialize());
+
+app.get('/hidden', passport.authenticate('basic', {
+    session: false
+}), function(req, res) {
+    res.json({
+        message: 'Luke...I am your father'
+    });
+});
+
 
 var databaseUri = global.databaseUri || 'mongodb://localhost/sup';
 mongoose.connect(databaseUri).then(function() {
