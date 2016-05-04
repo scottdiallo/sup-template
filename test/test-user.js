@@ -16,6 +16,15 @@ chai.use(spies);
 describe('User endpoints', function() {
     beforeEach(function() {
         mongoose.connection.db.dropDatabase();
+        var user = {
+          username: 'joe',
+          password: 'abc123',
+          _id: 'AAAAAAAAAAAAAAAAAAAAAAAA'
+        }
+        var promiseA = chai.request(app)
+                .post('/users')
+                .send(user);
+        return Promise.all([promiseA]);
     });
     describe('/users', function() {
         beforeEach(function() {
@@ -26,6 +35,7 @@ describe('User endpoints', function() {
             it('should return an empty list of users initially', function() {
                 return chai.request(app)
                     .get(this.pattern.stringify())
+                    .auth('joe', 'abc123')
                     .then(function(res) {
                         res.should.have.status(200);
                         res.type.should.equal('application/json');
@@ -38,21 +48,22 @@ describe('User endpoints', function() {
             it('should return a list of users', function() {
                 var user = {
                     username: 'joe',
-                    password: 'why1234'
+                    password: 'bye'
                 };
                 return chai.request(app)
                     .post(this.pattern.stringify())
                     .send(user)
                     .then(function(res) {
                         return chai.request(app)
-                            .get(this.pattern.stringify());
+                            .get(this.pattern.stringify())
+                            .auth('joe', 'abc123')
                     }.bind(this))
                     .then(function(res) {
                         res.should.have.status(200);
                         res.type.should.equal('application/json');
                         res.charset.should.equal('utf-8');
                         res.body.should.be.an('array');
-                        res.body.length.should.equal(1);
+                        res.body.length.should.equal(2);
                         res.body[0].should.be.an('object');
                         res.body[0].should.have.property('username');
                         res.body[0].username.should.be.a('string');
@@ -178,7 +189,8 @@ describe('User endpoints', function() {
                         return chai.request(app)
                             .get(this.pattern.stringify({
                                 userId: params.userId
-                            }));
+                            }))
+                            .auth('joe', 'abc123')
                     }.bind(this))
                     .then(function(res) {
                         res.should.have.status(200);
@@ -208,6 +220,7 @@ describe('User endpoints', function() {
                 var params;
                 return chai.request(app)
                     .post('/users')
+                    .auth('joe', 'abc123')
                     .send(oldUser)
                     .then(function(res) {
                         params = this.pattern.match(res.headers.location);
@@ -215,6 +228,7 @@ describe('User endpoints', function() {
                             .put(this.pattern.stringify({
                                 userId: params.userId
                             }))
+                            .auth('joe', 'abc123')
                             .send(newUser);
                     }.bind(this))
                     .then(function(res) {
@@ -227,7 +241,8 @@ describe('User endpoints', function() {
                         return chai.request(app)
                             .get(this.pattern.stringify({
                                 userId: params.userId
-                            }));
+                            }))
+                            .auth('joe', 'abc123')
                     }.bind(this))
                     .then(function(res) {
                         res.body.should.be.an('object');

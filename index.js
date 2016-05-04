@@ -131,9 +131,9 @@ app.post('/users', function(req, res) {
                 password: hash
 
             });
-            console.log("First log", user);
+            // console.log("First log", user);
             user.save().then(function(user) {
-                console.log("Second Log", user);
+                // console.log("Second Log", user);
                 res.location('/users/' + user._id).status(201).json(user);
             }).catch(function(err) {
                 res.status(500).send({
@@ -164,9 +164,7 @@ app.get('/users/:userId', passport.authenticate('basic', {
     });
 });
 
-app.put('/users/:userId', jsonParser, passport.authenticate('basic', {
-    session: false
-}), function(req, res) {
+app.put('/users/:userId', jsonParser, function(req, res) {
     if (!req.body) {
         return res.status(400).json({
             message: "No request body"
