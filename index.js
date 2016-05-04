@@ -38,7 +38,8 @@ var strategy = new BasicStrategy(function(username, password, callback) {
     });
 });
 passport.use(strategy); //telling passport to use strategy 12-38
-
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(jsonParser);
 // Add your API endpoints here
 app.get('/users',
 passport.authenticate('basic', {
@@ -51,6 +52,7 @@ function(req, res) {
 });
 
 app.post('/users', jsonParser, function(req, res) {
+
     if (!req.body) {
         return res.status(400).json({
             message: "No request body"
@@ -206,7 +208,7 @@ app.get('/messages', function(req, res) {
         });
 });
 
-app.post('/messages', jsonParser, function(req, res) {
+app.post('/messages', function(req, res) {
     if (!req.body) {
         return res.status(400).json({
             message: "No request body"
@@ -248,7 +250,9 @@ app.post('/messages', jsonParser, function(req, res) {
             message: 'Incorrect field type: from'
         });
     }
-
+    // console.log("From: ", req.body.from);
+    // console.log("To: ", req.body.to);
+    // console.log("Text: ", req.body.text);
     var message = new Message({
         from: req.body.from,
         to: req.body.to,
@@ -258,9 +262,11 @@ app.post('/messages', jsonParser, function(req, res) {
     var findFrom = User.findOne({
         _id: message.from
     });
+    // console.log('findFrom: ', message.from);
     var findTo = User.findOne({
         _id: message.to
     });
+    // console.log('findTo: ', message.to);
 
     return Promise.all([findFrom, findTo]).then(function(results) {
         if (!results[0]) {

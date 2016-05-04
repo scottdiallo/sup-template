@@ -5,6 +5,7 @@ var chaiHttp = require('chai-http');
 var spies = require('chai-spies');
 var mongoose = require('mongoose');
 var UrlPattern = require('url-pattern');
+// console.log(UrlPattern);
 var app = require('../index');
 
 var should = chai.should();
@@ -13,38 +14,42 @@ chai.use(chaiHttp);
 chai.use(spies);
 
 describe('Message endpoints', function() {
-    beforeEach(function() {
+    beforeEach('Create Users', function() {
+        // console.log('IN Create User!');
         mongoose.connection.db.dropDatabase();
         this.alice = {
             username: 'alice',
+            password: 'alice',
             _id: 'AAAAAAAAAAAAAAAAAAAAAAAA'
         };
 
         this.bob = {
             username: 'bob',
+            password: 'bob',
             _id: 'BBBBBBBBBBBBBBBBBBBBBBBB'
         };
 
         this.chuck = {
             username: 'chuck',
+            password: 'chuck',
             _id: 'CCCCCCCCCCCCCCCCCCCCCCCC'
         };
 
         // Create users
         var promiseA = chai.request(app)
-                .put('/users/' + this.alice._id)
+                .post('/users')
                 .send(this.alice);
         var promiseB = chai.request(app)
-                .put('/users/' + this.bob._id)
+                .post('/users')
                 .send(this.bob);
         var promiseC = chai.request(app)
-                .put('/users/' + this.chuck._id)
+                .post('/users')
                 .send(this.chuck);
         return Promise.all([promiseA, promiseB, promiseC]);
     });
 
     describe('/messages', function() {
-        beforeEach(function() {
+        beforeEach('Get Pattern', function() {
             this.pattern = new UrlPattern('/messages');
         });
 
@@ -360,7 +365,7 @@ describe('Message endpoints', function() {
                     .then(function(res) {
                         res.should.have.status(201);
                         res.type.should.equal('application/json');
-                        res.charset.should.equal('utf-8');
+                        // res.charset.should.equal('utf-8');
                         res.should.have.header('location');
                         res.body.should.be.an('object');
                         res.body.should.be.empty;
