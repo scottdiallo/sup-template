@@ -26,17 +26,12 @@ var strategy = new BasicStrategy(function(username, password, callback) {
                 message: 'Incorrect username.'
             });
         }
-        console.log('fafagahgljkah');
         user.validatePassword(password, function(err, isValid) {
-            console.log('ERROR',err);
-            console.log('VALID',isValid);
             if (err) {
-                console.log('afahkjfhahg');
                 return callback(err);
             }
 
             if (!isValid) {
-                //console.log(callback);
                 return callback(null, false, {
                     message: 'Incorrect password.'
                 });
@@ -54,16 +49,15 @@ var jsonParser = bodyParser.json();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
 
-app.get('/users', passport.authenticate('basic', {session: false}),
-function(req, res) {
+app.get('/users', function(req, res) {
     User.find({}).then(function(users) {
         res.json(users);
     });
-    if (!req.body.password) {
-        return res.status(400).json({
-            message: "Unauthorized"
-        });
-    }
+    // if (!req.body.password) {
+    //     return res.status(400).json({
+    //         message: "Unauthorized"
+    //     });
+    // }
 });
 
 app.post('/users', function(req, res) {
@@ -75,7 +69,6 @@ app.post('/users', function(req, res) {
 
     if (!('username' in req.body)) {
         return res.status(422).json({
-            //console.log(req.body.username);
             message: 'Missing field: username'
         });
     }
@@ -129,9 +122,7 @@ app.post('/users', function(req, res) {
                 password: hash
 
             });
-            console.log("First log", user);
             user.save().then(function(user) {
-                console.log("Second Log", user);
                 res.location('/users/' + user._id).status(201).json(user);
             }).catch(function(err) {
                 res.status(500).send({

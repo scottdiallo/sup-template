@@ -17,13 +17,13 @@ describe('User endpoints', function() {
     beforeEach(function() {
         mongoose.connection.db.dropDatabase();
         var user = {
-          username: 'joe',
-          password: 'abc123',
-          _id: 'AAAAAAAAAAAAAAAAAAAAAAAA'
-        }
+            username: 'joe',
+            password: 'abc123',
+            _id: 'AAAAAAAAAAAAAAAAAAAAAAAA'
+        };
         var promiseA = chai.request(app)
-                .post('/users')
-                .send(user);
+            .post('/users')
+            .send(user);
         return Promise.all([promiseA]);
     });
     describe('/users', function() {
@@ -32,18 +32,7 @@ describe('User endpoints', function() {
         });
 
         describe('GET', function() {
-            it('should return an empty list of users initially', function() {
-                return chai.request(app)
-                    .get(this.pattern.stringify())
-                    .auth('joe', 'abc123')
-                    .then(function(res) {
-                        res.should.have.status(200);
-                        res.type.should.equal('application/json');
-                        res.charset.should.equal('utf-8');
-                        res.body.should.be.an('array');
-                        res.body.length.should.equal(0);
-                    });
-            });
+
 
             it('should return a list of users', function() {
                 var user = {
@@ -56,7 +45,7 @@ describe('User endpoints', function() {
                     .then(function(res) {
                         return chai.request(app)
                             .get(this.pattern.stringify())
-                            .auth('joe', 'abc123')
+                            .auth('joe', 'abc123');
                     }.bind(this))
                     .then(function(res) {
                         res.should.have.status(200);
@@ -77,7 +66,7 @@ describe('User endpoints', function() {
         describe('POST', function() {
             it('should allow adding a user', function() {
                 var user = {
-                    username: 'joe',
+                    username: 'frank',
                     password: 'why123'
                 };
                 return chai.request(app)
@@ -89,7 +78,7 @@ describe('User endpoints', function() {
                         res.charset.should.equal('utf-8');
                         res.should.have.header('location');
                         res.body.should.be.an('object');
-                        res.body.should.be.empty;
+                        res.body.username.should.equal(user.username);
 
                         return chai.request(app)
                             .get(res.headers.location);
@@ -190,7 +179,7 @@ describe('User endpoints', function() {
                             .get(this.pattern.stringify({
                                 userId: params.userId
                             }))
-                            .auth('joe', 'abc123')
+                            .auth('joe', 'abc123');
                     }.bind(this))
                     .then(function(res) {
                         res.should.have.status(200);
@@ -202,7 +191,7 @@ describe('User endpoints', function() {
                         res.body.username.should.equal(user.username);
                         res.body.should.have.property('_id');
                         res.body._id.should.be.a('string');
-                        res.body._id.should.equal(params.userId)
+                        res.body._id.should.equal(params.userId);
                     });
             });
         });
@@ -242,7 +231,7 @@ describe('User endpoints', function() {
                             .get(this.pattern.stringify({
                                 userId: params.userId
                             }))
-                            .auth('joe', 'abc123')
+                            .auth('joe', 'abc123');
                     }.bind(this))
                     .then(function(res) {
                         res.body.should.be.an('object');
@@ -393,7 +382,7 @@ describe('User endpoints', function() {
                                 var res = err.response;
                                 res.should.have.status(404);
                             });
-                    }.bind(this))
+                    }.bind(this));
             });
         });
     });
