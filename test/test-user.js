@@ -333,6 +333,7 @@ describe('User endpoints', function() {
                     .delete(this.pattern.stringify({
                         userId: '000000000000000000000000'
                     }))
+                    .auth('joe','abc123')
                     .then(spy)
                     .then(function() {
                         spy.should.not.have.been.called();
@@ -361,7 +362,7 @@ describe('User endpoints', function() {
                         return chai.request(app)
                             .delete(this.pattern.stringify({
                                 userId: params.userId
-                            }));
+                            })).auth('joe','abc123');
                     }.bind(this))
                     .then(function(res) {
                         res.should.have.status(200);

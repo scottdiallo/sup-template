@@ -53,11 +53,6 @@ app.get('/users', function(req, res) {
     User.find({}).then(function(users) {
         res.json(users);
     });
-    // if (!req.body.password) {
-    //     return res.status(400).json({
-    //         message: "Unauthorized"
-    //     });
-    // }
 });
 
 app.post('/users', function(req, res) {
@@ -186,7 +181,7 @@ app.put('/users/:userId', jsonParser, function(req, res) {
     });
 });
 
-app.delete('/users/:userId', function(req, res) {
+app.delete('/users/:userId', passport.authenticate('basic', { session: false }), function(req, res) {
     User.findOneAndRemove({
         _id: req.params.userId
     }).then(function(user) {
