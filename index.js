@@ -36,7 +36,7 @@ var strategy = new BasicStrategy(function(username, password, callback) {
             }
 
             if (!isValid) {
-                console.log(callback);
+                //console.log(callback);
                 return callback(null, false, {
                     message: 'Incorrect password.'
                 });
