@@ -49,7 +49,7 @@ var jsonParser = bodyParser.json();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
 
-app.get('/users', function(req, res) {
+app.get('/users', passport.authenticate('basic', { session: false }), function(req, res) {
     User.find({}).then(function(users) {
         res.json(users);
     });
@@ -320,7 +320,7 @@ app.get('/hidden', passport.authenticate('basic', {
     session: false
 }), function(req, res) {
     res.json({
-        message: 'Luke...I am your father'
+        message: 'Luke...I am your father' //may the force be with you "scott"
     });
 });
 
