@@ -5,6 +5,10 @@ var chaiHttp = require('chai-http');
 var spies = require('chai-spies');
 var mongoose = require('mongoose');
 var UrlPattern = require('url-pattern');
+<<<<<<< HEAD
+=======
+var shared = require('./shared');
+>>>>>>> collab-branch
 var app = require('../index');
 
 var should = chai.should();
